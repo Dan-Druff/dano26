@@ -2,10 +2,11 @@ import { Hono } from 'hono'
 import { cors } from "hono/cors"; 
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 import { serveStatic } from 'hono/deno'
-
+import { Layout } from "./components/Layout.tsx";
 const app = new Hono()
 app.use("/*", cors());
 app.use("/static/*", serveStatic({ root: "./" }));
+
 app.get('/login',(c)=>{
   return c.text("LOGIN");
 })
@@ -76,7 +77,8 @@ app.get('/sell',(c)=>{
   return c.text("SELL");
 })
 app.get('/', (c) => {
-  return c.text('Hello MOMMY! Miss yea')
+  
+  return c.html(<Layout><h1>HOME</h1></Layout>)
 })
 
 
