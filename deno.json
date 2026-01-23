@@ -5,7 +5,7 @@
     "argon2": "npm:argon2"
   },
   "tasks": {
-    "start": "deno run --allow-net main.tsx",
+    "start": "deno run --allow-net --unstable-kv main.tsx",
     "dev":"deno run --allow-ffi --allow-net --allow-read --unstable-kv --allow-env --allow-sys --watch main.tsx"
   },
   "compilerOptions": {
