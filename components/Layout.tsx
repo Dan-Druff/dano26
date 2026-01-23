@@ -3,12 +3,12 @@ import { Nav } from "./Nav.tsx"
 type LayoutProps = {
     title?: string,
     email?:string,
-    userId?:string | null | undefined,
+    userId?:string,
     displayName?:string,
     children?: unknown
 }
 
-export function Layout({ title = "My Hono App", email= "Not Logged In", userId, displayName = "Login to Get Started", children }: LayoutProps) {
+export function Layout({ title = "DANO", email, userId, displayName = "Login to Get Started", children }: LayoutProps) {
   return (
     <html lang="en">
       <head>

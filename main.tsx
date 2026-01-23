@@ -3,30 +3,67 @@ import { cors } from "hono/cors";
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 import { serveStatic } from 'hono/deno'
 import { Layout } from "./components/Layout.tsx";
+import { authMiddleware, logger } from "./middleware/middleware.ts";
+import { LoginPage, SignupPage } from "./routes/Login.tsx";
+import api from "./utils/api.tsx";
+import { DB } from "./utils/db.ts";
+import { DBUserData } from "./utils/consts.ts";
+import { DashboardPage } from "./routes/Dashboard.tsx";
 const app = new Hono()
 app.use("/*", cors());
 app.use("/static/*", serveStatic({ root: "./" }));
-
+app.use("*", logger);
+app.route("/api",api);
 app.get('/login',(c)=>{
-  return c.text("LOGIN");
+  return c.html(<LoginPage></LoginPage>)
 })
 app.get('/signup',(c)=>{
-  return c.text("SIGNUP");
+  return c.html(<SignupPage></SignupPage>)
 })
-app.get('/ping',(c)=>{
-  return c.text("PING");
+app.get('/ping',async(c)=>{
+  const listall = await DB.getAllDataAsHtml()
+  return c.html(listall);
 })
-app.get('/clear',(c)=>{
-  return c.text("CLEAR");
+app.get('/clear',async(c)=>{
+  await DB.clearAllData() 
+  return c.text("DATA CLEARED");
 })
 app.get('/lobby',(c)=>{
   return c.text("LOBBY");
 })
-app.get('/logout',(c)=>{
-  return c.text("LOGOUT");
+app.get('/logout',async(c)=>{
+    // 1️⃣ Get the session cookie
+  const sessionId = getCookie(c, "sessionId")
+
+  // 2️⃣ Delete the session in KV if it exists
+  if (sessionId) {
+    await DB.SESSIONS.delete(sessionId) // or kv.delete(["sessions", sessionId])
+  }
+
+  // 3️⃣ Delete the cookie in the browser
+  deleteCookie(c, "sessionId", {
+    path: "/",       // important: match the cookie path
+    httpOnly: true,  // match what you set on login
+    secure: true,    // optional: match login config
+    sameSite: "Lax", // optional
+  })
+
+  // 4️⃣ Redirect to login page (or homepage)
+  return c.redirect("/")
 })
-app.get('/dashboard',(c)=>{
-  return c.text("DASHBOARD");
+app.get('/dashboard',authMiddleware,async(c)=>{
+  
+  const u = c.get("email")
+  const udata = await DB.read("users",u) as DBUserData | null;
+  if(!udata){console.log(`Got an error here`)}
+  const r = JSON.stringify(udata,null,2)
+  console.log(`DASHBAORD EMAIL IS: ${u}`)
+  if(udata){
+  return c.html(
+    <DashboardPage email={u} userData={udata}></DashboardPage>
+    );
+  }
+
 })
 app.get('/buyCards',(c)=>{
   return c.text("BUY CARDS");
@@ -77,8 +114,7 @@ app.get('/sell',(c)=>{
   return c.text("SELL");
 })
 app.get('/', (c) => {
-  
-  return c.html(<Layout><h1>HOME</h1></Layout>)
+  return c.html(<Layout><h1>home page</h1></Layout>)
 })
 
 

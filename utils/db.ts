@@ -1,7 +1,6 @@
+import { PFTx } from "./consts.ts";
+
 const kv = await Deno.openKv();
-
-
-
 export const DB = {
     SESSIONS:{
         delete:async(sessionId:string)=>{
@@ -213,27 +212,5 @@ export const DB = {
       console.log(`Error gettin all from coll ${error}`);
       return null;
     }
-  },
-};
-export const db = {
-  async saveUser(user: User) {
-    const u = await kv.set(["users", user.email], user);
-    if (u.ok) {
-      return true;
-    } else {
-      return false;
-    }
-  },
-  async getUser(email: string) {
-    const res = await kv.get<User>(["users", email]);
-    return res.value;
-  },
-  async createSession(token: string, userId: string) {
-    // Session expires in 24 hours
-    await kv.set(["sessions", token], userId, { expireIn: 86400000 });
-  },
-  async getSession(token: string) {
-    const res = await kv.get<string>(["sessions", token]);
-    return res.value;
   },
 };
