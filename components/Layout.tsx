@@ -8,7 +8,7 @@ type LayoutProps = {
     children?: unknown
 }
 
-export function Layout({ title = "DANO", email, userId, displayName = "Login to Get Started", children }: LayoutProps) {
+export function Layout({ title = "DANO", email, userId, displayName, children }: LayoutProps) {
   return (
     <html lang="en">
       <head>

@@ -1,6 +1,6 @@
 // @ts-check
 /// <reference lib="dom" />
-console.log(`HELLP DASHBOARD`)
+console.log(`HELP DASHBOARD`)
 const butt = document.getElementById("buttonPress")
 butt?.addEventListener("click", () => {
   console.log("clicked")

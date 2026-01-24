@@ -32,6 +32,7 @@ type SignupPageProps = {
     error?:string,
     email?:string
 }
+
 export const SignupPage = ({error,email}:SignupPageProps)=>{
     return (
         <Layout email={email}>

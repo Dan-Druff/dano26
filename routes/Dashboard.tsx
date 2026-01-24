@@ -12,7 +12,7 @@ export function DashboardPage({ userData, email }: DashboardProps) {
       <h2>DASHBOARD</h2>
       <pre>{email}</pre>
       <p>{JSON.stringify(userData,null,2)}</p>
-      <button id="buttonPress">PRESS ME</button>
+      <button type="button" id="buttonPress" class="butt">PRESS ME</button>
       <script src="/static/js/dashboard.js" defer></script>
     </Layout>
   )

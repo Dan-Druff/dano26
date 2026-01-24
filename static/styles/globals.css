@@ -1,6 +1,162 @@
+:root {
+
+    --primary-color: #CF0A0A;
+    --secondary-color: #DC5F00;
+    --accent-color: #DC5F00;
+    --text-color: #EEEEEE;
+    --background-color: #0c0c0c;
+    --orange:#E31837;
+    --green:#00285E;
+    --standard-color:#ffffff;
+    --rare-color:#006909;
+    --superrare-color:#aa1717;
+    --unique-color:#000000;
+    --hockey-blue:#003366;
+    --hockey-blue2:#041E42;
+
+    --anaheim:#B9975B;
+    --utah:#8C2633;
+    --boston:#FFB81C;
+    --buffalo:#003087;
+    --calgary:#D2001C;
+    --carolina:#CE1126;
+    --chicago:#CF0A2C;
+    --colorado:#6F263D;
+    --columbus:#002654;
+    --dallas:#006847;
+    --detroit:#CE1126;
+    --edmonton:#041E42;
+    --florida:#C8102E;
+    --losangeles:#A2AAAD;
+    --minnesota:#154734;
+    --montreal:#AF1E2D;
+    --nashville:#FFB81C;
+    --newjersey:#CE1126;
+    --islanders:#00539B;
+    --rangers:#0038A8;
+    --ottawa:#DA1A32;
+    --philadelphia:#F74902;
+    --pittsburgh:#FCB514;
+    --stlouis:#002F87;
+    --sanjose:#006D75;
+    --seattle:#68A2B9;
+    --tampabay:#002868;
+    --toronto:#00205B;
+    --vancouver:#00843D;
+    --lasvegas:#B4975A;
+    --washington:#041E42;
+    --winnipeg:#004C97;
+    --utah:#6CACE3;
+
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif; 
+}
+
 body{
     background-color: yellowgreen;
 }
+
 .nav {
-    background-color: aqua;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 10%;
+  background-color: #ffffff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.logo a {
+  font-size: 1.5rem;
+  font-weight: 800;
+  text-decoration: none;
+  color: #333;
+  letter-spacing: 1px;
+}
+
+.logo span {
+  color: #007bff; /* Accent color */
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 2rem; /* Even spacing between links */
+  align-items: center;
+}
+
+.nav-links li a {
+  text-decoration: none;
+  color: #555;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.nav-links li a:hover {
+  color: #007bff;
+}
+
+/* Optional: Call to Action Button */
+.btn-contact {
+  background-color: #007bff;
+  color: white !important;
+  padding: 0.6rem 1.2rem;
+  border-radius: 5px;
+  transition: background-color 0.3s ease !important;
+}
+
+.btn-contact:hover {
+  background-color: #0056b3 !important;
+}
+a {
+    text-decoration: none; /* Remove underline */
+    color: inherit; /* Use the current text color */
+    padding: 0; /* Reset padding */
+    margin: 0; /* Reset margin */
+    border: none; /* Remove any borders */
+    background: none; /* Remove any background */
+    cursor: pointer; /* Ensure the pointer cursor is used */
+    transition: color 0.3s ease; /* Add a smooth transition for color changes */
+}
+
+/* Add custom styles */
+a:hover {
+    color: var(--accent-color); /* Change color on hover */
+}
+/* .nav {
+    background-color: var(--primary-color);
+    width: 100%;
+
+    display: flex;
+    flex-direction: row;
+    text-align: center;
+    justify-content: space-evenly;
+ 
+} */
+.navright{
+    display: flex;
+    flex-direction: row;
+    /* text-align: center;
+    justify-content: space-evenly; */
+}
+.butt {
+    padding: 10px;
+    background-color: var(--accent-color);
+    color: black;
+    border: 1px solid black;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.row{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly
 }
