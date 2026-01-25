@@ -2191,7 +2191,7 @@ export const USERS = {
             await LOG.createLogFile(email,`${email} signed up.`)
             await DB.create("chirps",email,{all:[]}) 
             // await DB.makeFolder(userID);
-            await DB.create(`predictions${userID}`,"stats",{wins:0,losses:0,winningDays:0,losingDays:0})
+            await DB.create(`predictions-${userID}`,"stats",{wins:0,losses:0,winningDays:0,losingDays:0})
             return usr;
         } catch (error) {
             console.log(`Error SIGNING UP ${error}`)

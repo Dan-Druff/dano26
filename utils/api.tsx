@@ -5,6 +5,7 @@ import { LoginPage,SignupPage } from "../routes/Login.tsx";
 import { DBUserData, User } from "./consts.ts";
 import { HELPERS, USERS } from "./puckface.ts";
 import { setCookie, getCookie, deleteCookie } from "hono/cookie"
+import { authMiddleware } from "../middleware/middleware.ts";
 
 export async function hashPassword(password: string) {
   return await argon2.hash(password, {
@@ -116,6 +117,19 @@ api.post('/signup', async(c) => {
 
 
   
+})
+api.post('/submit-picks',authMiddleware,async(c)=>{
+  const body = await c.req.parseBody();
+  const email = c.get("email")
+  const uid = await HELPERS.emailUID(email);
+  const d = HELPERS.getPFDateFromDate(new Date);
+  const savePicks = await DB.create(`predictions-${uid}`,d.apiString,body);
+
+  // body will look like: { "game_123": "NYR", "game_456": "TBL" }
+  console.log("User Picks:", body);
+  
+
+  return c.redirect('/ping')
 })
 api.get('/', (c) => c.text('API GET')) 
 

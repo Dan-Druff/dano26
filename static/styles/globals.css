@@ -205,3 +205,30 @@ a:hover {
   transform: translateY(0);
   background-color: #e0e0e0;
 }
+/* Hide the actual radio circle */
+.team-label input[type="radio"] {
+  display: none;
+}
+
+/* Default state of the team box */
+.team-content {
+  cursor: pointer;
+  padding: 1rem;
+  border: 2px solid #eee;
+  border-radius: 12px;
+  transition: 0.2s;
+  text-align: center;
+}
+
+/* Hover effect */
+.team-content:hover {
+  background: #fafafa;
+  border-color: #ccc;
+}
+
+/* The Magic: When the hidden radio is checked, style the div next to it */
+input[type="radio"]:checked + .team-content {
+  border-color: #007bff;
+  background-color: #e7f3ff;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.2);
+}

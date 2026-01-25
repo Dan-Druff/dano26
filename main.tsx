@@ -11,6 +11,7 @@ import { DBUserData } from "./utils/consts.ts";
 import { DashboardPage } from "./routes/Dashboard.tsx";
 import { HELPERS, NHL } from "./utils/puckface.ts";
 import { NHLGame } from "./components/NHLGame.tsx";
+import { PredictorPage } from "./routes/Predictor.tsx";
 const app = new Hono()
 app.use("/*", cors());
 app.use("/static/*", serveStatic({ root: "./" }));
@@ -115,20 +116,31 @@ app.get('/trade',(c)=>{
 app.get('/sell',(c)=>{
   return c.text("SELL");
 })
-app.get('/predict',async(c)=>{
-    const g = await NHL.getNhlGamesWithRecords(HELPERS.getPFDateFromDate(new Date).apiString)
+app.get('/predict',authMiddleware,async(c)=>{
+    const u = c.get("email")
+  const udata = await DB.read("users",u) as DBUserData | null;
+  if(!udata){console.log(`Got an error here`)}
+  if(udata && u){
+    return c.html(<PredictorPage email={u} userData={udata}></PredictorPage>)
+  }else{
+    return c.text("Error")
+  }
 
-   return c.html(
-    <Layout>
-      <div class="games">
-      {g.map((game)=>{
-        return (
-          <NHLGame game={game}></NHLGame>
-        )
-      })}
+  //   const g = await NHL.getNhlGamesWithRecords(HELPERS.getPFDateFromDate(new Date).apiString)
+
+  //  return c.html(
+  //   <Layout>
+  //     <form action="/api/submit-picks" method="post">
+  //     <div class="games">
+  //       {g.map(g => <NHLGame game={g} key={g.gameId}/>)}
+  //     </div>
       
-    </div>
-    </Layout>)
+  //     <button type="submit" class="butt">
+  //       Submit All Picks
+  //     </button>
+  //   </form>
+   
+  //   </Layout>)
 })
 app.get('/', (c) => {
 
