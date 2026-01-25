@@ -1,6 +1,6 @@
 
 import { DB } from "./db.ts";
-import { RosterPlayer,PFTx, PFDate, DBUserData, PF_CONSTS, PFCard, DBGame, nobodyCard, CardDecon, PFRarityType, PFGamePosType, NHLGame, NHLGameData, PFTeamIds, PFNhlStatType, PFTeamCards, nobodyTeam, PFStats, PFGameState, ChirpType, DBChirp, NHLScoreboardResponse, PFPrediction, PFLeague, PFLeagueMembers } from "./consts.ts";
+import { RosterPlayer,PFTx, PFDate, DBUserData, PF_CONSTS, PFCard, DBGame, nobodyCard, CardDecon, PFRarityType, PFGamePosType, NHLGame, NHLGameData, PFTeamIds, PFNhlStatType, PFTeamCards, nobodyTeam, PFStats, PFGameState, ChirpType, DBChirp, NHLScoreboardResponse, PFPrediction, PFLeague, PFLeagueMembers, NHLGameWithRecord } from "./consts.ts";
 import MasterRoster from "../localDB/nhl/master_roster.json" with { type:"json"};
 const PLAYER_REGISTRY = new Map<number, RosterPlayer>(
   MasterRoster.map(p => [p.id, p])
@@ -2501,6 +2501,34 @@ export const NHL = {
     let txt = '';
     if(card1.points > card2.points){txt='Card 1 Wins'}else if(card1.points === card2.points){txt='Cards Tied'}else{txt='Card 2 Wins'}
     return txt;
+  },
+  getNhlGamesWithRecords:async(apiString:string)=>{
+            try {
+            const d = await fetch(`https://api-web.nhle.com/v1/scoreboard/now`);
+            const e = await d.json() as any;
+            const f = e.gamesByDate as any[];
+    
+            const g = f.filter(h => h.date === apiString)
+            const nhlgames :NHLGameWithRecord[] = g[0].games.map((gm:any) => {
+                const nn :NHLGameWithRecord = {
+                    awayTeamName:gm.awayTeam.name.default,
+                    awayLogo:gm.awayTeam.logo,
+                    awayRecord:gm.awayTeam.record ?? `Shots: ${gm.awayTeam.sog}`,
+                    awayTeamAbb:gm.awayTeam.abbrev,
+                    homeTeamName:gm.homeTeam.name.default,
+                    homeLogo:gm.homeTeam.logo,
+                    homeRecord:gm.homeTeam.record ?? `Shots: ${gm.homeTeam.sog}`,
+                    homeTeamAbb:gm.homeTeam.abbrev,
+                    gameId:gm.id,
+                    link:gm.gameCenterLink
+                }
+                return nn;
+            })
+            return nhlgames;
+        } catch (er) {
+            console.log(`Error getting gaems with records ${er}`);
+            return [];
+        }
   }
 }
 export const CHIRPS = {

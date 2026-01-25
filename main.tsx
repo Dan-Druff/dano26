@@ -9,6 +9,8 @@ import api from "./utils/api.tsx";
 import { DB } from "./utils/db.ts";
 import { DBUserData } from "./utils/consts.ts";
 import { DashboardPage } from "./routes/Dashboard.tsx";
+import { HELPERS, NHL } from "./utils/puckface.ts";
+import { NHLGame } from "./components/NHLGame.tsx";
 const app = new Hono()
 app.use("/*", cors());
 app.use("/static/*", serveStatic({ root: "./" }));
@@ -113,8 +115,27 @@ app.get('/trade',(c)=>{
 app.get('/sell',(c)=>{
   return c.text("SELL");
 })
+app.get('/predict',async(c)=>{
+    const g = await NHL.getNhlGamesWithRecords(HELPERS.getPFDateFromDate(new Date).apiString)
+
+   return c.html(
+    <Layout>
+      <div class="games">
+      {g.map((game)=>{
+        return (
+          <NHLGame game={game}></NHLGame>
+        )
+      })}
+      
+    </div>
+    </Layout>)
+})
 app.get('/', (c) => {
-  return c.html(<Layout><h1>home page</h1></Layout>)
+
+  return c.html(
+    <Layout>
+      <h2>HOME PAGE</h2>
+    </Layout>)
 })
 
 

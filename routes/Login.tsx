@@ -20,8 +20,7 @@ export const LoginPage = ({error,email}:LoginPageProps)=>{
                         <label>Password</label>
                         <input name="password" type="password" placeholder="At least 8 characters" minlength={8} required />
                     </div>
-                  
-                    <button type="submit">Login</button>
+                  <button type="submit">Login</button>
                 </form>
                 <div class="switch">Dont have have an account?<a href="/signup">Sign Up</a></div>
             </section>

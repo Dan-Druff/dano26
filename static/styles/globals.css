@@ -71,6 +71,7 @@ body{
   position: sticky;
   top: 0;
   z-index: 1000;
+  border-bottom: 2px solid black;
 }
 
 .logo a {
@@ -158,5 +159,49 @@ a:hover {
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-evenly
+    justify-content: space-evenly;
+}
+.games{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    gap: 1rem;
+}
+.gameCard{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    gap: 1rem;
+    border: 2px solid black;
+    border-radius: 10px;
+}
+.team-selection {
+  background: none;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* The "Indicator" on hover */
+.team-selection:hover {
+  background-color: #f0f0f0;
+  border-color: #007bff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Active/Selected State */
+.team-selection:active {
+  transform: translateY(0);
+  background-color: #e0e0e0;
 }

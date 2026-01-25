@@ -20,8 +20,6 @@ export function Layout({ title = "DANO", email, userId, displayName, children }:
       </head>
       <body>
         <Nav displayName={displayName} email={email} userId={userId}/>
-        <h3>BODY</h3>
-        <p>{title} {email} {displayName}</p>
         <main class="container">{children}</main>
       </body>
     </html>

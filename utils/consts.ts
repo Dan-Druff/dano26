@@ -41,6 +41,18 @@ export type PFGameState =
   | "Complete"
   | "Initialized"
   | "Tied";
+  export interface NHLGameWithRecord {
+    awayTeamName:string,
+    homeTeamName:string,
+    awayTeamAbb:string,
+    homeTeamAbb:string,
+    awayLogo:string,
+    homeLogo:string,
+    awayRecord:string,
+    homeRecord:string,
+    gameId:string,
+    link:string
+  }
 export interface PFLeagueRules {
   private:boolean,
   free:boolean,

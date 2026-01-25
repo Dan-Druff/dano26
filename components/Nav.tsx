@@ -10,11 +10,12 @@ export function Nav({ email, displayName, userId }: NavProps) {
     <nav class="nav">
      
       <div class="logo">
-        <a href="/">BRAND<span>DANO</span></a>
+        <a href="/">PUCK<span>FACE</span></a>
       </div>
       {isLoggedIn ? (
         <div class="nav-links">
           <a href="/dashboard">Dashboard</a>
+          <a href="/predict">Predictor</a>
           <a href="/profile">Profile</a>
 
           <span class="user">
