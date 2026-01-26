@@ -131,8 +131,8 @@ api.get('/check-picks',authMiddleware,async(c)=>{
     for (const [key, value] of Object.entries(pix)) {
       console.log(typeof key); // "string"
       console.log(key);        // "game_2025020819"
-      const gameId = key.split("_")[1]; 
-      gameIds.push({id:gameId,pick:value})
+      // const gameId = key.split("_")[1]; 
+      gameIds.push({id:key,pick:value})
     }
     const calcedGames = await Promise.all(gameIds.map(async(gid)=>{
       const getGame = await fetch(`https://api-web.nhle.com/v1/gamecenter/${gid.id}/landing`);
@@ -161,7 +161,7 @@ api.get('/check-picks',authMiddleware,async(c)=>{
     const updateUsersStats = await DB.update(`predictions-${uid}`,'stats',newUsersStats);
     const updateUsersPredictions = await DB.update(`predictions-${uid}`,d,{predictions:calcedGames})
     if(!updateUsersStats || !updateUsersPredictions){throw new Error(`🚦Couldnt update users info🚦`)}
-    
+
     // Now gameId is "2025020819"
     return c.json(calcedGames)
   } catch (error) {
