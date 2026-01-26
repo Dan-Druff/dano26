@@ -118,6 +118,57 @@ api.post('/signup', async(c) => {
 
   
 })
+api.get('/check-picks',authMiddleware,async(c)=>{
+  try {
+    const email = c.get("email")
+    const uid = await HELPERS.emailUID(email);
+    const d = "2026-01-25"
+    const pix = await DB.read(`predictions-${uid}`,d);
+    const usersStats = await DB.read(`predictions-${uid}`,'stats') as {wins:number,losses:number,winningDays:number,losingDays:number} | null;
+    if(!pix || !usersStats){throw new Error('🚦COuldnt get data🚦')};
+    const stats = {correct:0,incorrect:0}
+    const gameIds = [];
+    for (const [key, value] of Object.entries(pix)) {
+      console.log(typeof key); // "string"
+      console.log(key);        // "game_2025020819"
+      const gameId = key.split("_")[1]; 
+      gameIds.push({id:gameId,pick:value})
+    }
+    const calcedGames = await Promise.all(gameIds.map(async(gid)=>{
+      const getGame = await fetch(`https://api-web.nhle.com/v1/gamecenter/${gid.id}/landing`);
+      if (!getGame.ok) {throw new Error("🚦Failed to fetch NHL scoreboard data🚦")}
+      const gameData = await getGame.json();
+      // const gameIsFuture = gameData.gameState === "FUT" ? true : false;
+      // const gameIsOver = gameData.gameState === "OFF" ? true : false;
+      console.log(`Game: ${gameData.id}. Home:${gameData.homeTeam.abbrev} ${gameData.homeTeam.score} Away: ${gameData.awayTeam.abbrev} ${gameData.awayTeam.score}`)
+      const homeAbb = gameData.homeTeam.abbrev;
+      const awayAbb = gameData.awayTeam.abbrev;
+      const winner = gameData.homeTeam.score > gameData.awayTeam.score ? homeAbb : awayAbb;
+      console.log(`Winner is: ${winner}`)
+      console.log(`You picked ${gid.pick}`)
+      if(winner === gid.pick){
+        console.log(`You picked correctly`)
+        stats.correct++;
+      }else{
+        stats.incorrect++;
+        console.log(`You picked INcorrectly`)
+      }
+
+      console.log(`Game: ${gameData.id}. Home: ${gameData.homeTeam.score} Away:${gameData.awayTeam.score}`);
+      return {id:gid.id,pick:gid.pick,winner:winner}
+    }))
+    const newUsersStats = {wins:usersStats.wins + stats.correct,losses:usersStats.losses + stats.incorrect,winningDays:stats.correct > stats.incorrect ? usersStats.winningDays + 1 : usersStats.winningDays,losingDays:stats.incorrect >= stats.correct ? usersStats.losingDays + 1 : usersStats.losingDays}
+    const updateUsersStats = await DB.update(`predictions-${uid}`,'stats',newUsersStats);
+    const updateUsersPredictions = await DB.update(`predictions-${uid}`,d,{predictions:calcedGames})
+    if(!updateUsersStats || !updateUsersPredictions){throw new Error(`🚦Couldnt update users info🚦`)}
+    
+    // Now gameId is "2025020819"
+    return c.json(calcedGames)
+  } catch (error) {
+    console.log(`Couldnt calc picks ${error}`)
+    return c.text(`Error Calcing picks ${error}`)
+  }
+})
 api.post('/submit-picks',authMiddleware,async(c)=>{
   const body = await c.req.parseBody();
   const email = c.get("email")

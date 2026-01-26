@@ -2647,10 +2647,12 @@ export const PREDICTOR = {
   calculatePicksByUserAndDay:async(email:string,day:string):Promise<boolean>=>{
     try {
       const userID = await HELPERS.emailUID(email)
-      const pix = await DB.read(`predictions${userID}`,day) as {day:string,predictions:PFPrediction[]} | null;
+      // const pix = await DB.read(`predictions-${userID}`,day) as {day:string,predictions:PFPrediction[]} | null;
+      const pix = await DB.read(`predictions-${userID}`,day);
       if(!pix){throw new Error(`🚦Couldnt get pix🚦`)}
+
       const stats = {correct:0,incorrect:0}
-      const calcedGames = await Promise.all(pix.predictions.map(async(p)=>{
+      const calcedGames = await Promise.all(pix.predictions.map(async(p:any)=>{
         const getGame = await fetch(`https://api-web.nhle.com/v1/gamecenter/${p.gameID.toString()}/landing`)
         if (!getGame.ok) {throw new Error("Failed to fetch NHL scoreboard data")}
         const gameData = await getGame.json();
@@ -2667,7 +2669,7 @@ export const PREDICTOR = {
         }
         return p;
       }))
-      const usersStats = await DB.read(`predictions${userID}`,"stats") as {wins:number,losses:number,winningDays:number,losingDays:number} | null;
+      const usersStats = await DB.read(`predictions-${userID}`,"stats") as {wins:number,losses:number,winningDays:number,losingDays:number} | null;
       if(!usersStats){throw new Error(`🚦Couldnt get users stats🚦`)}
       const newUsersStats = {wins:usersStats.wins + stats.correct,losses:usersStats.losses + stats.incorrect, winningDays:stats.correct > stats.incorrect ? usersStats.winningDays + 1 : usersStats.winningDays,losingDays:stats.incorrect >= stats.correct ? usersStats.losingDays + 1 : usersStats.losingDays}
       const updateUsersStats = await DB.update(`predictions${userID}`,"stats",newUsersStats);

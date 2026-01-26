@@ -126,21 +126,7 @@ app.get('/predict',authMiddleware,async(c)=>{
     return c.text("Error")
   }
 
-  //   const g = await NHL.getNhlGamesWithRecords(HELPERS.getPFDateFromDate(new Date).apiString)
 
-  //  return c.html(
-  //   <Layout>
-  //     <form action="/api/submit-picks" method="post">
-  //     <div class="games">
-  //       {g.map(g => <NHLGame game={g} key={g.gameId}/>)}
-  //     </div>
-      
-  //     <button type="submit" class="butt">
-  //       Submit All Picks
-  //     </button>
-  //   </form>
-   
-  //   </Layout>)
 })
 app.get('/', (c) => {
 
