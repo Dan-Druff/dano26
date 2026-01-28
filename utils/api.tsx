@@ -3,9 +3,10 @@ import { DB } from "./db.ts";
 import argon2 from 'argon2'
 import { LoginPage,SignupPage } from "../routes/Login.tsx";
 import { DBUserData, User } from "./consts.ts";
-import { HELPERS, USERS } from "./puckface.ts";
+import { HELPERS, MARKET, USERS } from "./puckface.ts";
 import { setCookie, getCookie, deleteCookie } from "hono/cookie"
 import { authMiddleware } from "../middleware/middleware.ts";
+import { ErrorPage } from "../routes/Error.tsx";
 
 export async function hashPassword(password: string) {
   return await argon2.hash(password, {
@@ -122,7 +123,7 @@ api.get('/check-picks',authMiddleware,async(c)=>{
   try {
     const email = c.get("email")
     const uid = await HELPERS.emailUID(email);
-    const d = "2026-01-25"
+    const d = "2026-01-26"
     const pix = await DB.read(`predictions-${uid}`,d);
     const usersStats = await DB.read(`predictions-${uid}`,'stats') as {wins:number,losses:number,winningDays:number,losingDays:number} | null;
     if(!pix || !usersStats){throw new Error('🚦COuldnt get data🚦')};
@@ -181,6 +182,46 @@ api.post('/submit-picks',authMiddleware,async(c)=>{
   
 
   return c.redirect('/ping')
+})
+api.post('/buyPucks',authMiddleware,async(c)=>{
+  try {
+    
+    const body = await c.req.parseBody();
+    console.log(body)
+    const email = c.get("email")
+    console.log(`Emails is: ${email}`)
+    const uid = await HELPERS.emailUID(email);
+    console.log(`UID is: ${uid}`)
+    console.log(`${email} wants to buy pucks. ${JSON.stringify(body,null,2)}`)
+    const pucksToBuy = Number(body['userNumber']);
+    const bp = await MARKET.purchasePucks(email,pucksToBuy);
+    if(!bp){throw new Error(`🚦Something went wrong buying pucks.🚦`)}
+    return c.redirect('/dashboard')
+    
+  } catch (error) {
+    console.log(`🚦Couldnt get pucks ${error}🚦`)
+    return c.html(<ErrorPage message={`🚦Couldnt get pucks ${error}🚦`}></ErrorPage>);
+  }
+})
+api.post('/buyCards',authMiddleware,async(c)=>{
+  try {
+    
+    const body = await c.req.parseBody();
+    console.log(body)
+    const email = c.get("email")
+    console.log(`Emails is: ${email}`)
+    const uid = await HELPERS.emailUID(email);
+    console.log(`UID is: ${uid}`)
+    console.log(`${email} wants to buy cards. ${JSON.stringify(body,null,2)}`)
+    const cardsToBuy = Number(body['cardNumber']);
+    const bp = await MARKET.purchaseCards(email,cardsToBuy,12);
+    if(!bp){throw new Error(`🚦Something went wrong buying pucks.🚦`)}
+    return c.json({cards:bp})
+    
+  } catch (error) {
+    console.log(`🚦Couldnt get pucks ${error}🚦`)
+    return c.html(<ErrorPage message={`🚦Couldnt get pucks ${error}🚦`}></ErrorPage>);
+  }
 })
 api.get('/', (c) => c.text('API GET')) 
 

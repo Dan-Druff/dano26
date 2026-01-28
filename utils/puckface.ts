@@ -2247,13 +2247,13 @@ export const MARKET = {
   purchaseCards:async(email:string,quantity:number,cost:number):Promise<string[] | null>=>{
     try {
       const username = await HELPERS.emailUID(email);
-      const userdata = await DB.read("users",username) as DBUserData | null;
+      const userdata = await DB.read("users",email) as DBUserData | null;
       if(!userdata){throw new Error(`🚦Could not read userdata🚦`)}
       const usersBalance = userdata.pucks - cost;
       if(usersBalance < 0){throw new Error(`🚦User does nt have enough pucks for this. 🚦`)}
       const newCards = await MINTED.create(quantity);
       if(!newCards){throw new Error('🚦Couldnt get new cards.🚦')}
-      const updUsr = await DB.update('users',username,{pucks:usersBalance,cards:[...userdata.cards,...newCards]})
+      const updUsr = await DB.update('users',email,{pucks:usersBalance,cards:[...userdata.cards,...newCards]})
       if(!updUsr){throw new Error('🚦Error updating userdata.🚦')}
       const tx:PFTx = {
         by:PF_CONSTS.APP_NAME,
@@ -2262,14 +2262,14 @@ export const MARKET = {
         id:HELPERS.createRandomID(8),
         regarding:'Card Purchase',
         state:'complete',
-        to:username,
+        to:email,
         tx:true,
         type:'buyCards',
         value:cost,
         whatHappened:`${username} bought ${quantity} cards for ${cost} pucks.`,
         when:HELPERS.getPFDateFromDate(new Date).fullDate
       }
-      await LOG.add(username,tx);
+      await LOG.add(email,tx);
       return newCards;
     } catch (error) {
       console.log(`Couldnt purchase cards ${error}`)
@@ -2279,10 +2279,10 @@ export const MARKET = {
   purchasePucks:async(email:string,pucks:number):Promise<boolean>=>{
     try {
       const username = await HELPERS.emailUID(email)
-      const prevData = await DB.read('users',username) as DBUserData | null;
+      const prevData = await DB.read('users',email) as DBUserData | null;
       if(!prevData){throw new Error(`🚦Could not read user data 🚦`)}
       const newPucks = prevData.pucks + pucks;
-      const updRes = await DB.update('users',username,{pucks:newPucks})
+      const updRes = await DB.update('users',email,{pucks:newPucks})
       if(!updRes){throw new Error(`🚦 Couldnt Update User 🚦`)}
       const tx :PFTx = {
         by:PF_CONSTS.APP_NAME,
@@ -2291,14 +2291,14 @@ export const MARKET = {
         id:HELPERS.createRandomID(8),
         regarding:'Puck Purchase',
         state:'complete',
-        to:username,
+        to:email,
         tx:true,
         type:'buyPucks',
         value:pucks,
         whatHappened:`${username} purchased ${pucks} pucks.`,
         when:HELPERS.getPFDateFromDate(new Date).fullDate
       }
-      await LOG.add(username,tx);
+      await LOG.add(email,tx);
       return true;
     } catch (error) {
       console.log(`Error buying pucks ${error}`);
@@ -2479,13 +2479,13 @@ export const LOG = {
       return false;
     }
   },
-  add:async(userID:string,log:PFTx)=>{
+  add:async(email:string,log:PFTx)=>{
     try {
       // const userID = await HELPERS.emailUID(email)
-      console.log(`ADDING LOG TO USER: ${userID}`)
-      const userslogs = await DB.read('logs',userID) as {all:string[]} | null;
-      if(!userslogs){throw new Error(`🚦Could not read logs ${userID}🚦`)}
-      const upd = await DB.update('logs',userID,{all:[...userslogs.all,log]})
+      console.log(`ADDING LOG TO USER: ${email}`)
+      const userslogs = await DB.read('logs',email) as {all:string[]} | null;
+      if(!userslogs){throw new Error(`🚦Could not read logs ${email}🚦`)}
+      const upd = await DB.update('logs',email,{all:[...userslogs.all,log]})
       if(!upd){throw new Error(`🚦Error updating user logs🚦`)}
       return true;
     } catch (error) {

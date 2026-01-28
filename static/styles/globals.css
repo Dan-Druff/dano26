@@ -162,23 +162,49 @@ a:hover {
     justify-content: space-evenly;
 }
 .games{
-    display: flex;
+    /* display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    padding: 1rem;
-    gap: 1rem;
+    padding: 0.5rem;
+    gap: 0.5rem; */
+    display: grid;
+  /* This creates a grid where cards are at least 300px, 
+     but expand to fill space equally. */
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  padding: 2rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto; /* Centers the whole grid on the page */
+
 }
 .gameCard{
-    display: flex;
+    /* display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
     padding: 1rem;
     gap: 1rem;
     border: 2px solid black;
-    border-radius: 10px;
+    border-radius: 10px; */
+border: 2px solid #222;
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex; /* Flex is fine INSIDE the card */
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+  background: white;
+  transition: transform 0.2s;
+}
+.gameCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+.teamImg{
+    width: 50px;
 }
 .team-selection {
   background: none;

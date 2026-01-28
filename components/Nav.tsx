@@ -15,6 +15,7 @@ export function Nav({ email, displayName, userId }: NavProps) {
       {isLoggedIn ? (
         <div class="nav-links">
           <a href="/dashboard">Dashboard</a>
+          <a href="/market">Market</a>
           <a href="/predict">Predictor</a>
           <a href="/profile">Profile</a>
 

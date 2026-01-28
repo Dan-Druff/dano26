@@ -4,4 +4,5 @@ console.log(`HELP DASHBOARD`)
 const butt = document.getElementById("buttonPress")
 butt?.addEventListener("click", () => {
   console.log("clicked")
+  alert('You clicked it!');
 })

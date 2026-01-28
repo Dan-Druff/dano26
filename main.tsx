@@ -12,6 +12,10 @@ import { DashboardPage } from "./routes/Dashboard.tsx";
 import { HELPERS, NHL } from "./utils/puckface.ts";
 import { NHLGame } from "./components/NHLGame.tsx";
 import { PredictorPage } from "./routes/Predictor.tsx";
+import { MarketPage } from "./routes/Market.tsx";
+import { BuyPuckPage } from "./routes/BuyPucks.tsx";
+import { BuyCardPage } from "./routes/BuyCards.tsx";
+import { ErrorPage } from "./routes/Error.tsx";
 const app = new Hono()
 app.use("/*", cors());
 app.use("/static/*", serveStatic({ root: "./" }));
@@ -68,11 +72,29 @@ app.get('/dashboard',authMiddleware,async(c)=>{
   }
 
 })
-app.get('/buyCards',(c)=>{
-  return c.text("BUY CARDS");
+app.get('/buyCards',authMiddleware,async(c)=>{
+      try {
+          const u = c.get("email")
+          const udata = await DB.read("users",u) as DBUserData | null;
+          if(!udata){throw new Error(`🚦Couldnt get userdata🚦`)}
+          return c.html(<BuyCardPage email={u} userData={udata}></BuyCardPage>)
+      } catch (error) {
+        console.log(`Error buyiung cards: ${error}`)
+        return c.html(<ErrorPage message={`Error buyiung cards: ${error}`}></ErrorPage>)
+      }
+
 })
-app.get('/buyPucks',(c)=>{
-  return c.text("BUY PUCKS");
+app.get('/buyPucks',authMiddleware,async(c)=>{
+  try {
+      const u = c.get("email")
+      const udata = await DB.read("users",u) as DBUserData | null;
+      if(!udata){throw new Error(`🚦Couldnt get userdata🚦`)}
+      return c.html(<BuyPuckPage email={u} userData={udata}></BuyPuckPage>)
+  } catch (error) {
+    console.log(`🚦COuldnt buy pucks ${error}🚦`)
+    return c.redirect('/error')
+  }
+
 })
 app.get('/game',(c)=>{
   return c.text("GAME");
@@ -98,8 +120,18 @@ app.get('/leagues',(c)=>{
 app.get('/phl',(c)=>{
   return c.text("PHL");
 })
-app.get('/market',(c)=>{
-  return c.text("MARKET");
+app.get('/market',authMiddleware,async(c)=>{
+  try {
+      const u = c.get("email")
+      const udata = await DB.read("users",u) as DBUserData | null;
+      if(!udata){throw new Error(`🚦Couldnt get userdata🚦`)}
+      return c.html(<MarketPage userData={udata} email={u}></MarketPage>)
+  } catch (error) {
+    console.log(`Error on market page? ${error}`)
+    return c.redirect('/error');
+
+  }
+
 })
 app.get('/newCards',(c)=>{
   return c.text("NEW CARDS");
@@ -117,6 +149,9 @@ app.get('/sell',(c)=>{
   return c.text("SELL");
 })
 app.get('/predict',authMiddleware,async(c)=>{
+  // check to see if theres predictions to calculate
+  // show stats
+  // if todays picks have been submitted, show them
     const u = c.get("email")
   const udata = await DB.read("users",u) as DBUserData | null;
   if(!udata){console.log(`Got an error here`)}

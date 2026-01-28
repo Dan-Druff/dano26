@@ -11,19 +11,18 @@ export function NHLGame({ game }: NHLGameProps) {
       <label class="team-label">
         <input type="radio" name={`${game.gameId}`} value={game.awayTeamAbb} required />
         <div class="team-content">
-          <img src={game.awayLogo} alt="" />
+          <img class="teamImg" src={game.awayLogo} alt="" />
           <h3>{game.awayTeamAbb}</h3>
           <p>{game.awayRecord}</p>
         </div>
       </label>
         </div>
       <div class="vs">@</div>
-
       <div class="homeTeam">
       <label class="team-label">
         <input type="radio" name={`${game.gameId}`} value={game.homeTeamAbb} />
         <div class="team-content">
-          <img src={game.homeLogo} alt="" />
+          <img class="teamImg" src={game.homeLogo} alt="" />
           <h3>{game.homeTeamAbb}</h3>
               <p>{game.homeRecord}</p>
         </div>
