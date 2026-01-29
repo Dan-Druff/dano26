@@ -17,11 +17,8 @@ export function Nav({ email, displayName, userId }: NavProps) {
           <a href="/dashboard">Dashboard</a>
           <a href="/market">Market</a>
           <a href="/predict">Predictor</a>
-          <a href="/profile">Profile</a>
+          <a href="/profile">{displayName ?? email}</a>
 
-          <span class="user">
-            {displayName ?? email}
-          </span>
 
           <form method="get" action="/logout">
             <button type="submit" class="butt">Log out</button>

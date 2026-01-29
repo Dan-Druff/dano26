@@ -265,7 +265,7 @@ export interface NHLGameData {
     homeTeam: PlayerByGameStats;
   };
 }
-  export interface NHLGame {
+export interface NHLGame {
     id:number,
     date:string,
     awayTeamAbb:string,
@@ -436,10 +436,18 @@ export const nobodyCard: PFCard = {
   capHit:0,
   length:0
 };
+// Map codes to friendly messages (prevents showing ugly URL strings to users)
+export const errorMessages: Record<string, string> = {
+  invalid_credentials: "The email or password you entered is incorrect.",
+  user_exists: "An account with that email already exists.",
+  missing_fields: "Please fill out all required fields.",
+  default: "Something went wrong. Please try again."
+};
 export const PF_CONSTS = {
     APP_NAME:'Puckface',
     PACK_QUANTITY:8,
     PRICE_PER_PACK:10,
+    PRICE_PER_CARD:2,
     DEFAULT_AVATAR:`/images/pFeMOJI3.png`,
     DEF_CARD_ID:'defID',
     RARITY_VALUES:{

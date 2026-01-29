@@ -7,8 +7,7 @@ type LayoutProps = {
     displayName?:string,
     children?: unknown
 }
-
-export function Layout({ title = "DANO", email, userId, displayName, children }: LayoutProps) {
+export function Layout({ title = "PUCKFACE", email, userId, displayName, children }: LayoutProps) {
   return (
     <html lang="en">
       <head>

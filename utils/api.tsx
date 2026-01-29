@@ -2,11 +2,12 @@ import { Hono } from "hono";
 import { DB } from "./db.ts";
 import argon2 from 'argon2'
 import { LoginPage,SignupPage } from "../routes/Login.tsx";
-import { DBUserData, User } from "./consts.ts";
+import { DBUserData, PF_CONSTS, User } from "./consts.ts";
 import { HELPERS, MARKET, USERS } from "./puckface.ts";
 import { setCookie, getCookie, deleteCookie } from "hono/cookie"
 import { authMiddleware } from "../middleware/middleware.ts";
 import { ErrorPage } from "../routes/Error.tsx";
+import { NewCardsPage } from "../routes/NewCards.tsx";
 
 export async function hashPassword(password: string) {
   return await argon2.hash(password, {
@@ -29,27 +30,33 @@ api.post('/login', async(c) => {
         const form = await c.req.formData();
         const email = form.get("email");
         const password = form.get("password");
+        // We pass the error code AND the email back
+        const params = new URLSearchParams({
+          error: 'invalid_credentials',
+          email: email as string
+        });
+        const defParams = new URLSearchParams({
+          error: 'default',
+          email: email as string
+        });
+
+
         if(typeof email !== "string" || typeof password !== "string"){
-          if(typeof email === "string"){
-            return c.html(<SignupPage email={email} error="Invalid Form Data"/>)
-          }else{
-            return c.html(<SignupPage email="you@email.com" error="Invalid Form Data"/>)
-          }
-        
+            return c.redirect(`/login?${params.toString()}`);
         }
         const ud = await DB.read("userAuth",email)
         if(!ud){
-          return c.html(<LoginPage email={email} error="Something went wrong"/>)
+            return c.redirect(`/login?${defParams.toString()}`);
         }
         const v = await verifyPassword(ud.hashedPassword,password)
         if(!v){
-          return c.html(<LoginPage email={email} error="Something went wrong. Try again..."/>)
+            return c.redirect(`/login?${defParams.toString()}`);
         }
         console.log(`Password is ${v}`)
         const sessionId = crypto.randomUUID()
         const s = await DB.SESSIONS.create(sessionId,email)
         if(!s){
-          return c.html(<LoginPage email={email} error="Something went wrong. Try again..."/>)
+            return c.redirect(`/login?${defParams.toString()}`);
         }
           setCookie(c, "sessionId", sessionId, {
           httpOnly: true,
@@ -60,7 +67,12 @@ api.post('/login', async(c) => {
         })
         return c.redirect('/dashboard')
     } catch (error) {
-        console.log(`Error On Login ${error}`)
+        console.log(`Error On Login ${error}`);
+        const defParams = new URLSearchParams({
+          error: 'invalid_credentials',
+          email: 'you@example.com'
+        });
+        return c.redirect(`/login?${defParams.toString()}`);
     }
  
 
@@ -68,21 +80,26 @@ api.post('/login', async(c) => {
 }) 
 api.post('/signup', async(c) => {
 
+
     try {
+
         const form = await c.req.formData();
         const email = form.get("email");
         const password1 = form.get("password1");
         const password2 = form.get("password2")
+        const params = new URLSearchParams({
+          error: 'invalid_credentials',
+          email: email as string
+        });
+        const defParams = new URLSearchParams({
+          error: 'default',
+          email: email as string
+        });
         if(typeof email !== "string" || typeof password1 !== "string" || typeof password2 !== "string"){
-          if(typeof email === "string"){
-            return c.html(<SignupPage email={email} error="Invalid Form Data"/>)
-          }else{
-            return c.html(<SignupPage email="Something Went Wrong" error="Invalid Form Data"/>)
-          }
-          
+            return c.redirect(`/signup?${params.toString()}`);
         }
         if(password1 !== password2){
-          return c.html(<SignupPage email={email} error="Passwords do not match"/>)
+            return c.redirect(`/signup?${defParams.toString()}`);
         }
         const h1 = await hashPassword(password1);
    
@@ -90,10 +107,11 @@ api.post('/signup', async(c) => {
         const u :User = {email:email,id:uid,createdAt:HELPERS.getPFDateFromDate(new Date).fullDate,hashedPassword:h1}
         const setuser = await DB.create("userAuth",email,u)
         const uData = await USERS.signup(email)
+        if(!setuser || !uData){throw new Error(`🚦Couldnt set User or get data🚦`)}
         const sessionId = crypto.randomUUID()
         const session = await DB.SESSIONS.create(sessionId,email)
         if(!session){
-          return c.html(<SignupPage email={email} error="Couldnt Create A session"/>)
+            return c.redirect(`/signup?${defParams.toString()}`);
         }
         setCookie(c, "sessionId", sessionId, {
           httpOnly: true,
@@ -110,20 +128,19 @@ api.post('/signup', async(c) => {
         return c.redirect('/dashboard')
     } catch (error) {
         console.log(`Error on api signup ${error}`)
-     
-        return c.text(`Error on api signup ${error}`)
+        const defParams = new URLSearchParams({
+          error: 'default',
+          email: 'you@example.com'
+        });
+        return c.redirect(`/signup?${defParams.toString()}`);
     }
 
-
-
-
-  
 })
 api.get('/check-picks',authMiddleware,async(c)=>{
   try {
     const email = c.get("email")
     const uid = await HELPERS.emailUID(email);
-    const d = "2026-01-26"
+    const d = "2026-01-28"
     const pix = await DB.read(`predictions-${uid}`,d);
     const usersStats = await DB.read(`predictions-${uid}`,'stats') as {wins:number,losses:number,winningDays:number,losingDays:number} | null;
     if(!pix || !usersStats){throw new Error('🚦COuldnt get data🚦')};
@@ -209,15 +226,13 @@ api.post('/buyCards',authMiddleware,async(c)=>{
     const body = await c.req.parseBody();
     console.log(body)
     const email = c.get("email")
-    console.log(`Emails is: ${email}`)
-    const uid = await HELPERS.emailUID(email);
-    console.log(`UID is: ${uid}`)
-    console.log(`${email} wants to buy cards. ${JSON.stringify(body,null,2)}`)
+    const udata = await DB.read('users',email) as DBUserData | null;
+    if(!udata){throw new Error(`🚦Couldnt read userdata🚦`)}
     const cardsToBuy = Number(body['cardNumber']);
-    const bp = await MARKET.purchaseCards(email,cardsToBuy,12);
-    if(!bp){throw new Error(`🚦Something went wrong buying pucks.🚦`)}
-    return c.json({cards:bp})
-    
+    const cost = PF_CONSTS.PRICE_PER_CARD * cardsToBuy;
+    const bp = await MARKET.purchaseCards(email,cardsToBuy,cost);
+    if(!bp){throw new Error(`🚦Something went wrong buying cards.🚦`)}
+    return c.redirect('/newCards')
   } catch (error) {
     console.log(`🚦Couldnt get pucks ${error}🚦`)
     return c.html(<ErrorPage message={`🚦Couldnt get pucks ${error}🚦`}></ErrorPage>);
