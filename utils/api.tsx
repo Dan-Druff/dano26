@@ -74,10 +74,7 @@ api.post('/login', async(c) => {
         });
         return c.redirect(`/login?${defParams.toString()}`);
     }
- 
-
-
-}) 
+ }) 
 api.post('/signup', async(c) => {
 
 
@@ -222,7 +219,6 @@ api.post('/buyPucks',authMiddleware,async(c)=>{
 })
 api.post('/buyCards',authMiddleware,async(c)=>{
   try {
-    
     const body = await c.req.parseBody();
     console.log(body)
     const email = c.get("email")
@@ -235,7 +231,10 @@ api.post('/buyCards',authMiddleware,async(c)=>{
     return c.redirect('/newCards')
   } catch (error) {
     console.log(`🚦Couldnt get pucks ${error}🚦`)
-    return c.html(<ErrorPage message={`🚦Couldnt get pucks ${error}🚦`}></ErrorPage>);
+        const defParams = new URLSearchParams({
+          error: 'cards'
+        });
+    return c.redirect(`/error?${defParams.toString()}`);
   }
 })
 api.get('/', (c) => c.text('API GET')) 

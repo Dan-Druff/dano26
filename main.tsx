@@ -18,6 +18,8 @@ import { BuyCardPage } from "./routes/BuyCards.tsx";
 import { ErrorPage } from "./routes/Error.tsx";
 import { ProfilePage } from "./routes/Profile.tsx";
 import { NewCardsPage } from "./routes/NewCards.tsx";
+import { CardsPage } from "./routes/Cards.tsx";
+import { CardPage } from "./routes/Card.tsx";
 const app = new Hono();
 app.use("/*", cors());
 app.use("/static/*", serveStatic({ root: "./" }));
@@ -25,14 +27,14 @@ app.use("*", logger);
 app.route("/api", api);
 app.get("/login", (c) => {
   const errorKey = c.req.query('error');
-  const savedEmail = c.req.query('email') || 'you@example.com';
+  const savedEmail = c.req.query('email');
   const message = errorKey ? (errorMessages[errorKey] || errorMessages.default) : undefined;
 
   return c.html(<LoginPage email={savedEmail} error={message}></LoginPage>);
 });
 app.get("/signup", (c) => {
     const errorKey = c.req.query('error');
-  const savedEmail = c.req.query('email') || 'you@example.com';
+  const savedEmail = c.req.query('email');
   const message = errorKey ? (errorMessages[errorKey] || errorMessages.default) : undefined;
 
   return c.html(<SignupPage email={savedEmail} error={message}></SignupPage>);
@@ -118,14 +120,30 @@ app.get("/createGame", (c) => {
 app.get("/joinGame", (c) => {
   return c.text("JOIN GAME");
 });
-app.get("/card", (c) => {
-  return c.text("CARD");
+app.get("/card/:id",authMiddleware, async(c) => {
+  try {
+
+      const cardID = c.req.param('id');
+      const u = c.get("email");
+      const udata = await DB.read("users", u) as DBUserData | null;
+      console.log(`id:${cardID} user:${u} udata:${udata}`)
+      if(!u || !udata || !cardID){throw new Error(`Couldnt get required info`)}
+      return c.html(<CardPage card={cardID} email={u} userData={udata}></CardPage>)
+  } catch (error) {
+      console.log(`Something went wrong getting card ${error}`)
+      return c.redirect('/error')
+  }
+
 });
-app.get("/cards", (c) => {
-  return c.text("CARDS");
+app.get("/cards", authMiddleware,async(c) => {
+     const u = c.get("email");
+    const udata = await DB.read("users", u) as DBUserData | null;
+  return c.html(<CardsPage email={u} userData={udata}></CardsPage>)
 });
 app.get("/error", (c) => {
-  return c.html(<ErrorPage message={`🚦Something went wrong🚦`}></ErrorPage>);
+    const errorKey = c.req.query('error');
+    const message = errorKey ? (errorMessages[errorKey] || errorMessages.default) : undefined;
+    return c.html(<ErrorPage message={`🚦 ${message} 🚦`}></ErrorPage>);
 });
 app.get("/leagues", (c) => {
   return c.text("LEAGUES");

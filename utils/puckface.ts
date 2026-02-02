@@ -1263,7 +1263,7 @@ export const getCardFromId = async (
     let plusMinus = 0;
     let points = 0;
     const playingTonight = teamsPlayingTonight.indexOf(decon.team) > -1;
-    let inGame = "";
+    let inGame = "none";
     let inUse: PFGamePosType = "NONE";
     activeGameList.forEach((g) => {
       if (g.homeTeam.c === cardId) {

@@ -441,7 +441,8 @@ export const errorMessages: Record<string, string> = {
   invalid_credentials: "The email or password you entered is incorrect.",
   user_exists: "An account with that email already exists.",
   missing_fields: "Please fill out all required fields.",
-  default: "Something went wrong. Please try again."
+  default: "Something went wrong. Please try again.",
+  cards:"Something went wrong buying cards"
 };
 export const PF_CONSTS = {
     APP_NAME:'Puckface',

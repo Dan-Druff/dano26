@@ -5,7 +5,6 @@ type NavProps = {
 }
 export function Nav({ email, displayName, userId }: NavProps) {
   const isLoggedIn = Boolean(email)
-
   return (
     <nav class="nav">
      
